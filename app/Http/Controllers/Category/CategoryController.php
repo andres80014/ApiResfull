@@ -63,7 +63,7 @@ class CategoryController extends ApiController
     
     
     public function update(Request $request, $id)
-    {
+    { 
         $category = Category::findOrFail($id);
         //$category->fill($request->intersect('name','description'));
         //cambia el metodo intersec por 

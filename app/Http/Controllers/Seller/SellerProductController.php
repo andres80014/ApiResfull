@@ -8,6 +8,9 @@ use App\Product;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+
 
 class SellerProductController extends ApiController
 {
@@ -41,7 +44,7 @@ class SellerProductController extends ApiController
         return $this->showOne($product , 201);
     }
     
-     public function update(Request $request, Seller $seller, Product $product)
+    public function update(Request $request, Seller $seller, Product $product)
     {
          $rules = [
             'quantity' => 'integer|min:1',
@@ -50,8 +53,7 @@ class SellerProductController extends ApiController
         ];
          
          
-         $this->validate($request ,$rules);
-         
+         $this->verificarVendedor($seller, $product);
          if($seller->id != $product->seller_id){
              $this->errorResponse("El vendeder no es el dueño del producto ",422);
          }
@@ -69,5 +71,19 @@ class SellerProductController extends ApiController
          $product->save();
          return $this->showOne($product);
          
+    }
+    
+    public function destroy(Seller $seller, Product $product)
+    {
+        $this->verificarVendedor($seller, $product);
+        $product->delete();
+        return $this->showOne($product);
+    }
+    
+    protected function verificarVendedor(Seller $seller, Product $product)
+    {
+        if($seller->id != 10){
+            throw new HttpException(422, 'El vendedor no es el dueño del producto ');
+        }
     }
 }
