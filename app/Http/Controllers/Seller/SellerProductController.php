@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Seller;
 use App\User;
 use App\Product;
-
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 
@@ -32,7 +32,6 @@ class SellerProductController extends ApiController
         ];
         $this->validate($request ,$rules);
         
-        
         $data = $request->all();
         $data['status'] = Product::PRODUCTO_NO_DISPONIBLE;
         $data['image'] = '1.jpg';
@@ -40,5 +39,35 @@ class SellerProductController extends ApiController
         
         $product = Product::create($data);
         return $this->showOne($product , 201);
+    }
+    
+     public function update(Request $request, Seller $seller, Product $product)
+    {
+         $rules = [
+            'quantity' => 'integer|min:1',
+            'status' => 'in:'.Product::PRODUCTO_NO_DISPONIBLE . ',' . Product::PRODUCTO_DISPONIBLE,
+            'image' =>'image'
+        ];
+         
+         
+         $this->validate($request ,$rules);
+         
+         if($seller->id != $product->seller_id){
+             $this->errorResponse("El vendeder no es el dueño del producto ",422);
+         }
+        $product->fill($request->only('name','description','quantity'));
+        
+        if($request->has('status')){
+             $product->status = $request->status; 
+             if($product->estaDisponible() && $product->categories()->count() ==0){
+                 $this->errorResponse("un producto activo debe tener una categoria  ",409);
+             }
+         }
+         if($product->isClean()){
+             $this->errorResponse("no se ha realizado ningun cambio  ",422);
+         }
+         $product->save();
+         return $this->showOne($product);
+         
     }
 }

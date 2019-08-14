@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Category;
 use App\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
-use Illuminate\Support\Collection;
 
 class CategoryController extends ApiController
 {
@@ -58,19 +57,32 @@ class CategoryController extends ApiController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Category  $category
+     * @param  \App\Category  $category 
      * @return \Illuminate\Http\Response
      */
+    
+    
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
-        $category->fill($request->intersect('name','description'));
-        
-        $category->name = $request->name;
-        $category->description = $request->description;
+        //$category->fill($request->intersect('name','description'));
+        //cambia el metodo intersec por 
+        $category->fill($request->only([
+            'name',
+            'description',
+        ]));
+         
+                
+        if($category->isClean()){
+            return $this->errorResponse("No hay cambios", 422);
+        }
+        //$category->name = $request->name;
+        //$category->description = $request->description;
         $category->save();
         return $this->showOne($category);
     }
+    
+     
 
     /**
      * Remove the specified resource from storage.
