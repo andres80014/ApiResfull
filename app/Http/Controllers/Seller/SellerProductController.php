@@ -73,7 +73,7 @@ class SellerProductController extends ApiController
          
     }
     
-    public function destroy(Seller $seller, Product $product)
+    public function destroy(Seller $seller, Product $product) 
     {
         $this->verificarVendedor($seller, $product);
         $product->delete();
