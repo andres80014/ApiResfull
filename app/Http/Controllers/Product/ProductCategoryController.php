@@ -18,4 +18,13 @@ class ProductCategoryController extends ApiController
         $categories = $product->categories;
         return $this->showAll($categories);
     }
+    
+    public function update(Request $request, Product $product){
+        
+    }
+    
+    public function destroy(Product $product){
+        
+    }
+
 }
