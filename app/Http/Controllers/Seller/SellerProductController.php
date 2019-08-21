@@ -7,6 +7,7 @@ use App\User;
 use App\Product;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -35,9 +36,9 @@ class SellerProductController extends ApiController
         ];
         $this->validate($request ,$rules);
         
-        $data = $request->all();
-        $data['status'] = Product::PRODUCTO_NO_DISPONIBLE;
-        $data['image'] = '1.jpg';
+        $data              = $request->all();
+        $data['status']    = Product::PRODUCTO_NO_DISPONIBLE;
+        $data['image']     = $request->image->store('');
         $data['seller_id'] = $seller->id;
         
         $product = Product::create($data);
@@ -65,6 +66,11 @@ class SellerProductController extends ApiController
                  $this->errorResponse("un producto activo debe tener una categoria  ",409);
              }
          }
+          
+          if ($request->hasFile('image')) {
+            Storage::delete($product->image);
+            $product->image = $request->image->store('');
+        }
          if($product->isClean()){
              $this->errorResponse("no se ha realizado ningun cambio  ",422);
          }
@@ -76,13 +82,14 @@ class SellerProductController extends ApiController
     public function destroy(Seller $seller, Product $product) 
     {
         $this->verificarVendedor($seller, $product);
+        Storage::delete($product->image);
         $product->delete();
         return $this->showOne($product);
     }
     
     protected function verificarVendedor(Seller $seller, Product $product)
     {
-        if($seller->id != 10){
+        if($seller->id != $product->seller_id){
             throw new HttpException(422, 'El vendedor no es el dueño del producto ');
         }
     }
