@@ -31,7 +31,5 @@ class ProductController extends ApiController
         $product = Product::findOrFail($id);
         return $this->showOne($product, 200);
     }
-    
-    
 
 }
