@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+use App\Transformers\CategoryTransformer; 
 use App\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +17,8 @@ class Category extends Model
         'description'
     ];
 
+    public $transformer = CategoryTransformer::class;
+    
     protected $hidden = ['pivot'];
             
     public function products(){

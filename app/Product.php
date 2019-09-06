@@ -1,7 +1,7 @@
 <?php
 
 namespace App;
-
+use App\Transformers\ProductTransformer;
 use App\Seller;
 use App\Category;
 use App\Transaction;
@@ -15,7 +15,7 @@ class Product extends Model
     protected $dates = ['deleted_at'];
     const PRODUCTO_DISPONIBLE = 'disponible';
     const PRODUCTO_NO_DISPONIBLE = 'no disponible';
-
+    public $transformer = ProductTransformer::class;
     
     protected $primaryKey =  'id'; 
 
